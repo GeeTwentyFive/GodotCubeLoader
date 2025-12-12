@@ -3,6 +3,7 @@ class_name CubeLoader
 
 class Cube:
 	var position: Vector3
+	var rotation: Vector3
 	var size: Vector3
 	var color: Color
 
@@ -13,13 +14,18 @@ static func load(path: String) -> Node3D:
 	var cubes_data_offset := 0
 	
 	var num_cubes := cubes_data.decode_u32(cubes_data_offset)
-	print(num_cubes)
 	cubes_data_offset += 4
 	var cubes: Array[Cube] = []
 	cubes.resize(num_cubes)
 	for i in range(num_cubes):
 		var cube := Cube.new()
 		cube.position = Vector3(
+			cubes_data.decode_float(cubes_data_offset),
+			cubes_data.decode_float(cubes_data_offset+4),
+			cubes_data.decode_float(cubes_data_offset+4+4)
+		)
+		cubes_data_offset += 4+4+4
+		cube.rotation = Vector3(
 			cubes_data.decode_float(cubes_data_offset),
 			cubes_data.decode_float(cubes_data_offset+4),
 			cubes_data.decode_float(cubes_data_offset+4+4)
@@ -52,6 +58,7 @@ static func load(path: String) -> Node3D:
 		var cube_mesh_instance := MeshInstance3D.new()
 		cube_mesh_instance.mesh = cube_mesh
 		cube_mesh_instance.position = cubes[i].position
+		cube_mesh_instance.rotation = cubes[i].rotation
 		
 		out_cubes.add_child(cube_mesh_instance)
 	return out_cubes
